@@ -1,0 +1,68 @@
+body {
+    margin: 0;
+    font-family: "Comic Sans MS", fantasy;
+}
+
+main {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-content: flex-start;
+    height: 100vh;
+}
+
+section {
+    margin: 8px;
+}
+
+section header {
+    background-color: darkslateblue;
+    color: white;
+}
+
+label {
+    font-weight: bold;
+    margin-left: 8px;
+}
+
+.data-field {
+    margin-right: 8px;
+}
+
+#data-section {
+    display: flex;
+    flex-direction: column;
+}
+
+#city-section {
+    align-self: center;
+}
+
+#cities-list {
+    background-color: lightcyan;
+}
+
+#weather-section {
+    display: grid;
+    grid: repeat(4, 1fr) / 1fr max-content;
+    justify-content: start;
+    grid-column-gap: 10px;
+    border: 1px solid darkblue;
+    border-radius: 5px;
+}
+
+#weather-section header {
+    grid-column: span 2;
+    text-align: center;
+}
+
+#map-section {
+    margin:0;
+    min-width: 65vw;
+    height: 100%;
+    flex-grow: 1;
+}
+
+* {
+    box-sizing: border-box;
+}
