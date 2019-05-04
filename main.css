@@ -1,14 +1,18 @@
-body {
+* {
+    box-sizing: border-box;
+}
+
+body, html {
     margin: 0;
+    height: 100%;
     font-family: "Comic Sans MS", fantasy;
 }
 
 main {
+    min-height: 100%;
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    align-content: flex-start;
-    height: 100vh;
 }
 
 section {
@@ -29,6 +33,12 @@ label {
     margin-right: 8px;
 }
 
+#map-section {
+    min-width: 70vw;
+    min-height: 78vh;
+    flex-grow: 1;
+}
+
 #data-section {
     display: flex;
     flex-direction: column;
@@ -45,7 +55,6 @@ label {
 #weather-section {
     display: grid;
     grid: repeat(4, 1fr) / 1fr max-content;
-    justify-content: start;
     grid-column-gap: 10px;
     border: 1px solid darkblue;
     border-radius: 5px;
@@ -54,15 +63,4 @@ label {
 #weather-section header {
     grid-column: span 2;
     text-align: center;
-}
-
-#map-section {
-    margin:0;
-    min-width: 65vw;
-    height: 100%;
-    flex-grow: 1;
-}
-
-* {
-    box-sizing: border-box;
 }

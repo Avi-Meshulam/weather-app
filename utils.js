@@ -8,7 +8,18 @@ contentTypes.set('json', 'application/json');
 contentTypes.set('txt', 'text/plain');
 contentTypes.set('', 'text/plain');  // default for files with no extension
 
-function loadFile(fileName) {
+function getContentType(fileName) {
+    const fileExt = fileName.split('.')[1].toLowerCase() || '';
+    return contentTypes.get(fileExt);
+}
+
+HTMLElement.prototype.removeChildren = function() {
+    while (this.firstChild) {
+        this.removeChild(this.firstChild);
+    }
+};
+
+function loadLocalFile(fileName) {
     const xhr = new XMLHttpRequest();
     xhr.overrideMimeType(getContentType(fileName));
     return new Promise((resolve, reject) => {
@@ -23,19 +34,12 @@ function loadFile(fileName) {
     });
 }
 
-function getContentType(fileName) {
-    const fileExt = fileName.split('.')[1].toLowerCase() || '';
-    return contentTypes.get(fileExt);
-}
-
 function buildUrl(baseUrl, ...params) {
     return params.reduce((p1, p2) => p1 + `&${p2}`, baseUrl);
 }
 
-function removeChildren(elem) {
-    while (elem.firstChild) {
-        elem.removeChild(elem.firstChild);
-    }
-}
+const caseInsensitiveCompare = (a, b) =>
+    a.localeCompare(b, undefined, {sensitivity: 'base'});
 
-export {loadFile, removeChildren, buildUrl}
+
+export {loadLocalFile, buildUrl, caseInsensitiveCompare}
