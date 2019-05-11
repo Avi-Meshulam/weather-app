@@ -1,45 +1,47 @@
 'use strict';
 
-const contentTypes = new Map();
-contentTypes.set('html', 'text/html');
-contentTypes.set('js', 'text/javascript');
-contentTypes.set('css', 'text/css');
-contentTypes.set('json', 'application/json');
-contentTypes.set('txt', 'text/plain');
-contentTypes.set('', 'text/plain');  // default for files with no extension
+// Trims leading and trailing input string parameter
+String.prototype.trim = function (str = ' ') {
+    let result = this.toString();
 
-function getContentType(fileName) {
+    // trim leading occurrences
+    while(result.substr(0, str.length) === str) {
+        result = result.substr(str.length)
+    }
+
+    // trim trailing occurrences
+    while (result.substr(-(str.length)) === str) {
+        result = result.substr(0, result.length - str.length);
+    }
+
+    return result;
+};
+
+const contentTypes = new Map();
+contentTypes.set('js', 'text/javascript');
+contentTypes.set('json', 'application/json');
+contentTypes.set('ico', 'image/x-icon');
+['html', 'css'].forEach(ext => contentTypes.set(ext, `text/${ext}`));
+['gif', 'png', 'jpg'].forEach(ext => contentTypes.set(ext, `image/${ext}`));
+['txt', ''].forEach(ext => contentTypes.set(ext, 'text/plain'));
+
+// return Content-Type http attribute according to file's extension
+function getContentType(fileName = '.') {
     const fileExt = fileName.split('.')[1].toLowerCase() || '';
     return contentTypes.get(fileExt);
 }
 
-HTMLElement.prototype.removeChildren = function() {
-    while (this.firstChild) {
-        this.removeChild(this.firstChild);
-    }
-};
-
-function loadLocalFile(fileName) {
-    const xhr = new XMLHttpRequest();
-    xhr.overrideMimeType(getContentType(fileName));
-    return new Promise((resolve, reject) => {
-        xhr.open('GET', fileName, true);
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState === 4 && xhr.status === 200) {
-                resolve(xhr.responseText);
-            }
-        };
-        xhr.onerror = () => reject(xhr.responseText);
-        xhr.send(null);
-    });
-}
-
+// append parameters to a base url
 function buildUrl(baseUrl, ...params) {
     return params.reduce((p1, p2) => p1 + `&${p2}`, baseUrl);
 }
 
-const caseInsensitiveCompare = (a, b) =>
-    a.localeCompare(b, undefined, {sensitivity: 'base'});
+function mergeObjects(...objects) {
+    return objects.reduce((obj1, obj2) => Object.assign({ ...obj1 }, { ...obj2 }));
+}
 
+function buildHeader(contentType, ...objects) {
+    return mergeObjects({'Content-Type': contentType}, ...objects)
+}
 
-export {loadLocalFile, buildUrl, caseInsensitiveCompare}
+module.exports = {getContentType, buildHeader, buildUrl};
