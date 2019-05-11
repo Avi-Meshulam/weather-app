@@ -2,28 +2,17 @@
 
 // Trims leading and trailing input string parameter
 String.prototype.trim = function (str = ' ') {
-    let result = this.toString();
-
-    // trim leading occurrences
-    while(result.substr(0, str.length) === str) {
-        result = result.substr(str.length)
-    }
-
-    // trim trailing occurrences
-    while (result.substr(-(str.length)) === str) {
-        result = result.substr(0, result.length - str.length);
-    }
-
-    return result;
+    const regExp = new RegExp(`^(${str})+|(${str})+$`, 'g');
+    return this.replace(regExp, '');
 };
 
 const contentTypes = new Map();
-contentTypes.set('js', 'text/javascript');
 contentTypes.set('json', 'application/json');
 contentTypes.set('ico', 'image/x-icon');
+contentTypes.set('js', 'text/javascript');
 ['html', 'css'].forEach(ext => contentTypes.set(ext, `text/${ext}`));
-['gif', 'png', 'jpg'].forEach(ext => contentTypes.set(ext, `image/${ext}`));
 ['txt', ''].forEach(ext => contentTypes.set(ext, 'text/plain'));
+['gif', 'png', 'jpg'].forEach(ext => contentTypes.set(ext, `image/${ext}`));
 
 // return Content-Type http attribute according to file's extension
 function getContentType(fileName = '.') {
