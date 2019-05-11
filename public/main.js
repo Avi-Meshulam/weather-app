@@ -18,7 +18,10 @@ const weatherElem = document.querySelector('#weather-section');
 
 let selectedCity;
 
+// Add startup page to navigation history
 window.history.replaceState(-1, '', serverUrl);
+
+// this event is triggered when the user clicks the browser's back or forward buttons
 window.onpopstate = function (e) {
     if (Number.isInteger(e.state) && citiesListElement.selectedIndex !== e.state) {
         citiesListElement.selectedIndex = e.state;
@@ -57,8 +60,17 @@ function renderCities(cities) {
 
 function addCityMarker(city, icon = DEFAULT_CITY_MARKER_ICON) {
     const marker = new L.marker([city.coord.lat, city.coord.lon], {title: city.name, icon: icon});
+    marker.cityId = city.id;
+    marker.on('click', markerClicked);
     marker.addTo(map);
     markersCache.set(city, marker);
+}
+
+function markerClicked(e) {
+    if(citiesListElement.value !== this.cityId) {
+        citiesListElement.value = this.cityId;
+        citiesListElement.dispatchEvent(new Event("change"));
+    }
 }
 
 function createCityElement(city) {
