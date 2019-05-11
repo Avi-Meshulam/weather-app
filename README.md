@@ -11,6 +11,8 @@
 - [lodash](https://www.npmjs.com/package/lodash)
 
 ### Features
+#### Responsive design - The display is adjusted to screen dimensions
+
 #### Caching:
 Server side:
 
