@@ -6,6 +6,8 @@ String.prototype.trim = function (str = ' ') {
     return this.replace(regExp, '');
 };
 
+const citiesCache = new Map();
+
 const contentTypes = new Map();
 contentTypes.set('json', 'application/json');
 contentTypes.set('ico', 'image/x-icon');
@@ -29,8 +31,8 @@ function mergeObjects(...objects) {
     return objects.reduce((obj1, obj2) => Object.assign({ ...obj1 }, { ...obj2 }));
 }
 
-function buildHeader(contentType, ...objects) {
-    return mergeObjects({'Content-Type': contentType}, ...objects)
+function buildHeader(fileName, ...objects) {
+    return mergeObjects({'Content-Type': getContentType(fileName)}, ...objects)
 }
 
-module.exports = {getContentType, buildHeader, buildUrl};
+module.exports = {buildHeader, buildUrl, citiesCache};

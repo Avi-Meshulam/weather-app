@@ -4,12 +4,14 @@ const http = require('http');
 const url = require('url');
 const _ = require('lodash');
 const io = require('./io');
-const getContentType = require('./utils').getContentType;
-const buildHeader = require('./utils').buildHeader;
+const buildHeader = require('./shared').buildHeader;
+const citiesCache = require('./shared').citiesCache;
 const getWeatherByCityId = require('./weather').getByCityId;
+const getWeatherByCityName = require('./weather').getByCityName;
 
 const PUBLIC_FOLDER = 'public';
 const DEFAULT_PUBLIC_RESOURCE = 'index.html';
+const CITIES_FILE = 'cities.json';
 const PORT = 8080;
 
 const filesCache = new Map();
@@ -30,6 +32,8 @@ async function cacheFiles() {
             .catch(err => err)  // prevent breaking on rejection
         ));
     await Promise.all(readPromises);
+    JSON.parse(filesCache.get(CITIES_FILE))
+        .forEach(city => citiesCache.set(city.id, city));
 }
 
 function handleRequest(req, res) {
@@ -54,14 +58,18 @@ function handleGetRequest(req, res) {
     if (result) {
         getWeatherByCityId(Number(result[1]))
             .then(data => {
+                res.writeHead(200, buildHeader('*.json'));
                 res.end(data);
-                res.writeHead(200, buildHeader(getContentType('*.json')));
             });
-    } else if (filesCache.has(path)) {
-        res.writeHead(200, buildHeader(getContentType(path)));
-        res.end(filterJSON(filesCache.get(path), query));
+    } else if (path === 'weather' && query && query.city) {
+        const [city, country] = query.city.split(',');
+        getWeatherByCityName(city, country)
+            .then(data => {
+                res.setHeader('Set-Cookie', [`weatherData=${data}`]);
+                sendFile(res, DEFAULT_PUBLIC_RESOURCE);
+            });
     } else {
-        handleNewFileRequest(res, path, query);
+        sendFile(res, path, query);
     }
 }
 
@@ -75,17 +83,25 @@ function parseRequest(req) {
     }
 }
 
+function sendFile(res, fileName, query) {
+    if (filesCache.has(fileName)) {
+        res.writeHead(200, buildHeader(fileName));
+        res.end(filterJSON(filesCache.get(fileName), query));
+    } else {
+        handleNewFileRequest(res, fileName, query);
+    }
+}
+
 function handleNewFileRequest(res, fileName, query) {
     io.readFile(`${PUBLIC_FOLDER}/${fileName}`)
         .then(data => {
             filesCache.set(fileName, data);
-            const contentType = getContentType(fileName);
-            res.writeHead(200, buildHeader(contentType));
+            res.writeHead(200, buildHeader(fileName));
             res.write(filterJSON(data, query));
         })
         .catch(err => {
             let status = err.code === 'ENOENT' ? 404 : 500;
-            res.writeHead(status, buildHeader(getContentType()));
+            res.writeHead(status, buildHeader());
             res.write(err.message);
         })
         .finally(() =>
