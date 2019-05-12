@@ -33,11 +33,10 @@ Client side:
 
 ### Routes:
 
-| Route                     | Description
-| ------------------------- | -----------
-| /                         | Root - Weather data is not displayed and map is scaled to fit the world
-| /weather/{cityId}         | City's weather - Displays the weather of the selected city and zooms the map on that city
-| /weather?cityId={cityId}  | Same as above
+| Route                           | Description
+| ------------------------------- | -----------
+| /                               | Root - Weather data is not displayed and map is scaled to fit the world
+| /weather?city={city},{country}  | City's weather - Displays the weather of the selected city and zooms the map on that city
 
 ### User Interface
 
